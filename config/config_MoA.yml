@@ -1,0 +1,3 @@
+# parameters configuration
+mode: train
+root: data/Mechanisms of Action (MoA) Prediction
