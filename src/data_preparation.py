@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from os.path import join
 from sklearn.model_selection import train_test_split
+import random
 from typing import TypeVar, Optional, Callable
 T_co = TypeVar('T_co', covariant=True)
 
@@ -54,6 +55,7 @@ class MyMoADataset(Dataset):
                 onehot.append(np.eye(len(self.cp_dose))[self.cp_dose[v]])
         onehot = np.concatenate(onehot)
         sample = np.append(sample[idx], onehot).astype(np.float32)
+        sample = sample[None]
         target = self.targets[index]
         if self.transform is not None:
             sample = self.transform(sample)
@@ -83,6 +85,9 @@ class MoALightningDataModule(BaseLightningDataModule):
         targets = pd.read_csv(join(self.root, 'train_targets_scored.csv'))
         columns = targets.columns.values[1:]
         targets = targets.loc[:, columns].values
+        index = random.sample(population=range(len(data)), k=self.max_samples)
+        data = data[index]
+        targets = targets[index]
         self.data = data
         self.targets = targets
 
