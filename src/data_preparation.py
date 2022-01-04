@@ -56,7 +56,7 @@ class MyMoADataset(Dataset):
         onehot = np.concatenate(onehot)
         sample = np.append(sample[idx], onehot).astype(np.float32)
         sample = sample[None]
-        target = self.targets[index]
+        target = self.targets[index].astype(np.float32)
         if self.transform is not None:
             sample = self.transform(sample)
         if self.target_transform is not None:
@@ -85,13 +85,15 @@ class MoALightningDataModule(BaseLightningDataModule):
         targets = pd.read_csv(join(self.root, 'train_targets_scored.csv'))
         columns = targets.columns.values[1:]
         targets = targets.loc[:, columns].values
-        index = random.sample(population=range(len(data)), k=self.max_samples)
-        data = data[index]
-        targets = targets[index]
         self.data = data
         self.targets = targets
 
     def setup(self, stage: Optional[str] = None) -> None:
+        if self.max_samples is not None:
+            index = random.sample(population=range(len(self.data)),
+                                  k=self.max_samples)
+            self.data = self.data[index]
+            self.targets = self.targets[index]
         x_train, x_val, y_train, y_val = train_test_split(
             self.data, self.targets, test_size=self.val_size)
         self.train_dataset = MyMoADataset(

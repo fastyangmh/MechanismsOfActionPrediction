@@ -218,6 +218,13 @@ lr: 1e-3
 model_name: src/SelfDefinedModel.py
 loss_function_name: BCEWithLogitsLoss
 checkpoint_path: null
+seed: 0
+early_stopping: True
+patience: 3
+default_root_dir: save/
+gpus: 1
+precision: 32
+max_epochs: 100
 
 # transforms configuration
 transforms_config:
